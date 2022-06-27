@@ -19,19 +19,19 @@ public class Teil7 {
 
         DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
         String url = "jdbc:oracle:thin:@oracle19c.in.htwg-konstanz.de:1521:ora19c";
-        Connection conn = DriverManager.getConnection(url, "dbsys16", "dbsys16");
+        Connection conn = DriverManager.getConnection(url, "dbsys23", "dbsys23");
         if (conn == null)
             System.out.println("KEINE CONNECTION!");
 
         // Anzahl Länder ermitteln
-        PreparedStatement ps = conn.prepareStatement("SELECT count(name_land) FROM dbsys16.land");
+        PreparedStatement ps = conn.prepareStatement("SELECT count(name_land) FROM dbsys23.land");
         ResultSet rs = ps.executeQuery();
         while(rs.next()) {
             anzahlLänder = rs.getInt("count(name_land)");
         }
         // Array mit ländern erzeugen und füllen
         String[] länder = new String[anzahlLänder];
-        ps = conn.prepareStatement("SELECT name_land FROM dbsys16.land");
+        ps = conn.prepareStatement("SELECT name_land FROM dbsys23.land");
         rs = ps.executeQuery();
         int i = 0;
         while (rs.next()) {
@@ -40,14 +40,14 @@ public class Teil7 {
         }
 
         // Anzahl ausstattungen ermitteln
-        ps = conn.prepareStatement("SELECT count(name_ausstattung) FROM dbsys16.ausstattungen");
+        ps = conn.prepareStatement("SELECT count(name_ausstattung) FROM dbsys23.ausstattungen");
         rs = ps.executeQuery();
         while(rs.next()) {
             anzahlAusstattungen = rs.getInt("count(name_ausstattung)");
         }
         // Array mit ausstattungen erzeugen und füllen
         String[] ausstattungen = new String[anzahlAusstattungen + 1];
-        ps = conn.prepareStatement("SELECT name_ausstattung FROM dbsys16.ausstattungen");
+        ps = conn.prepareStatement("SELECT name_ausstattung FROM dbsys23.ausstattungen");
         rs = ps.executeQuery();
         i = 0;
         ausstattungen[i] = "-----";
@@ -117,10 +117,10 @@ public class Teil7 {
         if (ausstattung.equals("-----")) {
             ps = conn.prepareStatement(
                     "SELECT b.name_ferienwohnung, avg(b.bewertung)\n" +
-                            "FROM dbsys16.Ferienwohnung f\n" +
-                            "LEFT OUTER JOIN dbsys16.Buchung b ON b.name_ferienwohnung = f.name_ferienwohnung\n" +
+                            "FROM dbsys23.Ferienwohnung f\n" +
+                            "LEFT OUTER JOIN dbsys23.Buchung b ON b.name_ferienwohnung = f.name_ferienwohnung\n" +
                             "WHERE f.name_land = ?\n" +
-                            "AND NOT EXISTS (SELECT buchungsnummer FROM dbsys16.Buchung b2\n" +
+                            "AND NOT EXISTS (SELECT buchungsnummer FROM dbsys23.Buchung b2\n" +
                             "                WHERE b.name_ferienwohnung = b2.name_ferienwohnung\n" +
                             "                AND (b2.abreisedatum BETWEEN TO_DATE(?, 'DD.MM.YYYY') AND TO_DATE(?, 'DD.MM.YYYY')\n" +
                             "                OR (b2.anreisedatum BETWEEN TO_DATE(?, 'DD.MM.YYYY') AND TO_DATE(?, 'DD.MM.YYYY'))\n" +
@@ -139,11 +139,11 @@ public class Teil7 {
         } else {
             ps = conn.prepareStatement(
                     "SELECT b.name_ferienwohnung, avg(b.bewertung)\n" +
-                            "FROM dbsys16.Ferienwohnung f INNER JOIN dbsys16.besitzt a ON a.name_ferienwohnung = f.name_ferienwohnung\n" +
-                            "LEFT OUTER JOIN dbsys16.Buchung b ON b.name_ferienwohnung = f.name_ferienwohnung\n" +
+                            "FROM dbsys23.Ferienwohnung f INNER JOIN dbsys23.besitzt a ON a.name_ferienwohnung = f.name_ferienwohnung\n" +
+                            "LEFT OUTER JOIN dbsys23.Buchung b ON b.name_ferienwohnung = f.name_ferienwohnung\n" +
                             "WHERE f.name_land = ?\n" +
                             "AND a.name_ausstattung = ?\n" +
-                            "AND NOT EXISTS (SELECT buchungsnummer FROM dbsys16.Buchung b2\n" +
+                            "AND NOT EXISTS (SELECT buchungsnummer FROM dbsys23.Buchung b2\n" +
                             "                WHERE b.name_ferienwohnung = b2.name_ferienwohnung\n" +
                             "                AND (b2.abreisedatum BETWEEN TO_DATE(?, 'DD.MM.YYYY') AND TO_DATE(?, 'DD.MM.YYYY')\n" +
                             "                OR (b2.anreisedatum BETWEEN TO_DATE(?, 'DD.MM.YYYY') AND TO_DATE(?, 'DD.MM.YYYY'))\n" +
@@ -180,7 +180,7 @@ public class Teil7 {
         }
 
         int[] preise = new int[100];
-        PreparedStatement getPreis = conn.prepareStatement("SELECT Preis from dbsys16.Ferienwohnung WHERE name_ferienwohnung = ?");
+        PreparedStatement getPreis = conn.prepareStatement("SELECT Preis from dbsys23.Ferienwohnung WHERE name_ferienwohnung = ?");
         ResultSet preisRes;
         for (int j = 0; j < index; j++) {
             getPreis.setString(1, trefferName[j]);
@@ -248,8 +248,8 @@ public class Teil7 {
         String sysDate = dtf.format(now);
         String bewertungsDatum = dtf.format(bewertungsDatumTime);
 
-        PreparedStatement update = conn.prepareStatement("INSERT INTO dbsys16.buchung(buchungsnummer, bewertung, bewertungsdatum, buchungsdatum, anreisedatum, abreisedatum, rechnungsnummer, rechnungsdatum, betrag, name_ferienwohnung, kundennummer)\n" +
-                "        VALUES(dbsys16.buchungsNR.NextVal, ?, TO_DATE(?, 'DD.MM.YYYY'), TO_DATE(?, 'DD.MM.YYYY'), TO_DATE(?, 'DD.MM.YYYY'), TO_DATE(?, 'DD.MM.YYYY'), ?, TO_DATE(?, 'DD.MM.YYYY'), ?, ?, ?)");
+        PreparedStatement update = conn.prepareStatement("INSERT INTO dbsys23.buchung(buchungsnummer, bewertung, bewertungsdatum, buchungsdatum, anreisedatum, abreisedatum, rechnungsnummer, rechnungsdatum, betrag, name_ferienwohnung, kundennummer)\n" +
+                "        VALUES(dbsys23.buchungsNR.NextVal, ?, TO_DATE(?, 'DD.MM.YYYY'), TO_DATE(?, 'DD.MM.YYYY'), TO_DATE(?, 'DD.MM.YYYY'), TO_DATE(?, 'DD.MM.YYYY'), ?, TO_DATE(?, 'DD.MM.YYYY'), ?, ?, ?)");
         update.setInt(1, 5);
         update.setString(2, bewertungsDatum);
         update.setString(3, sysDate);
